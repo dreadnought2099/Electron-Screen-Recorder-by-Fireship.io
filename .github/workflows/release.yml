@@ -6,12 +6,16 @@ on:
       - "v*" # Trigger only when you push a version tag (e.g. v1.0.0)
   workflow_dispatch: # Allow manual runs
 
+permissions:
+  contents: write # 👈 Required so action-gh-release can publish releases
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false # 👈 ensures one failing job doesn’t cancel others
 
     steps:
       - name: Checkout repository
@@ -32,6 +36,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: out/make/**
+          files: out/make/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
